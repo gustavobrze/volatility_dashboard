@@ -22,6 +22,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+@st.cache_data(ttl=1800)
 def get_data(tickers, benchmarks, start_date, end_date):
     
     all_tickers = tickers + benchmarks
