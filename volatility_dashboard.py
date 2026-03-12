@@ -91,25 +91,40 @@ with st.sidebar:
     ticker_input = st.text_input("Ativos (separados por vírgula)", default_tickers)
     tickers = [t.strip().upper() for t in ticker_input.split(',')]
     
+    # Weight Input
     st.write("---")
-    weight_mode = st.radio("Pesos", ["Pesos iguais", "Pesos personalizados"])
+    weight_mode = st.radio("Weighting Scheme", ["Equal Weights", "Custom (Long/Short)"])
     
-    if weight_mode == "Pesos personalizados":
-        weight_input = st.text_input("Pesos (Separados por vírgula, devem somar 1)", 
-                                     ", ".join([str(1/len(tickers))]*len(tickers)))
+    if weight_mode == "Custom (Long/Short)":
+        st.caption("Use negative numbers for short positions (e.g., 0.5, -0.2, 0.3)")
+        weight_input = st.text_input("Weights (comma separated)", 
+                                     ", ".join([str(round(1/len(tickers), 2))]*len(tickers)))
         try:
             weights = [float(w) for w in weight_input.split(',')]
             if len(weights) != len(tickers):
-                st.error("Pesos devem corresponder ao número de ativos.")
+                st.error("Number of weights must match number of assets.")
                 st.stop()
-            weights = np.array(weights) / np.sum(weights) # Normalize to 1
-        except:
-            st.error("Formato de pesos inválido.")
+            
+            weights = np.array(weights)
+            
+            # Optional: Normalize by Gross Exposure so the total book size = 100%
+            # gross_exposure = np.sum(np.abs(weights))
+            # if gross_exposure > 0:
+            #     weights = weights / gross_exposure
+                
+        except ValueError:
+            st.error("Invalid weight format. Please use numbers only.")
             st.stop()
     else:
+        # Equal weights (Long only)
         weights = np.array([1/len(tickers)] * len(tickers))
         
-    st.info(f"Pesos atuais: {weights}")
+    st.info(f"Active Weights: {weights}")
+    
+    # Calculate Net and Gross Exposure for the analyst's awareness
+    net_exposure = np.sum(weights)
+    gross_exposure = np.sum(np.abs(weights))
+    st.caption(f"**Net Exposure:** {net_exposure:.0%} | **Gross Exposure:** {gross_exposure:.0%}")
 
     st.write("---")
     st.header("Parâmetros de Cálculo")
