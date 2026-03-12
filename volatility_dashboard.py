@@ -82,12 +82,12 @@ def calculate_portfolio_vol_series(returns, weights, lambda_param):
             
     return pd.Series(port_vols, index=dates) * np.sqrt(252)
 
-st.title("Dashboard: Volatilidade e Correlação")
+st.title("Volatilidade e Correlação")
 
 with st.sidebar:
     st.header("Parâmetros do Portfólio")
     
-    default_tickers = "MELI, UNH, PANW, ORCL, PLTR, JPM, AMZN"
+    default_tickers = "MELI, UNH, PANW, ORCL, PLTR, JPM, AMZN, POMO4.SA, HASH11.SA, SOLH11.SA, BRAV3.SA, BOVA11.SA"
     ticker_input = st.text_input("Ativos (separados por vírgula)", default_tickers)
     tickers = [t.strip().upper() for t in ticker_input.split(',')]
     
